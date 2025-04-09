@@ -30,14 +30,14 @@ import dorna
 def connect_and_move():
     # Create a Dorna object
     robot = dorna.Dorna()
-    
+
     # Connect to the robot
     robot.connect('YOUR_BOT_IP_OR_PORT')
-    
+
     # Send a simple command
     # Move the robot joints or coordinate system according to your setup
     robot.play({“command”: “jmove”, “j0”: 10, “j1”: 0, “speed”: 100})
-    
+
     # Disconnect after usage
     robot.disconnect()
 
@@ -51,3 +51,34 @@ if __name__ == “__main__”:
 cd dorna2
 pip install -e .
 ```
+
+# Gripper Code
+
+`pip install https://github.com/openUC2/UC2-REST/archive/refs/heads/master.zip`
+
+```py
+#%%
+import uc2rest
+import numpy as np
+import time
+
+port = "unknown"
+port = "/dev/cu.SLAB_USBtoUART"
+ESP32 = uc2rest.UC2Client(serialport=port, baudrate=115200, DEBUG=True, skipFirmwareCheck =True)
+
+# open gripper
+ESP32.gripper.open(isBlocking=True)
+# close gripper
+ESP32.gripper.close(isBlocking=True)
+# set gripper angle
+ESP32.gripper.setAngle(90, isBlocking=True)
+
+
+ESP32.close()
+```
+
+# Showcase
+
+A hungry gripper:
+
+![](./IMAGES/dornagripper.gif)
