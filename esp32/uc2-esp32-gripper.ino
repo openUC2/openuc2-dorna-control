@@ -62,7 +62,7 @@ void parseSerialJson(const String& input) {
   StaticJsonDocument<200> doc;
   DeserializationError err = deserializeJson(doc, input);
   if (err) {
-    Serial.println("++{\"success\":false,\"error\":\"JSON parse error\"}--");
+    Serial.println("++\n{\"success\":0,\"error\":\"JSON parse error\"}\n--");
     return;
   }
 
@@ -86,7 +86,7 @@ void parseSerialJson(const String& input) {
     //   "qid": <qid if provided>
     // }
     // Use quotes around strings in JSON
-    Serial.print("++{\"identifier_name\":\"UC2_Feather\",");
+    Serial.print("++\n{\"identifier_name\":\"UC2_Feather\",");
     Serial.print("\"identifier_id\":\"V2.0\",");
     Serial.print("\"identifier_date\":\"");
     Serial.print(__DATE__); 
@@ -98,12 +98,12 @@ void parseSerialJson(const String& input) {
     Serial.print("\"configIsSet\":0,");
     Serial.print("\"pindef\":\"UC2\",");
 
-    Serial.print("\"success\":true");
+    Serial.print("\"success\":1");
     if (qid >= 0) {
       Serial.print(",\"qid\":");
       Serial.print(qid);
     }
-    Serial.println("}--");
+    Serial.println("}\n--");
     return;
   }
 
@@ -119,7 +119,7 @@ void parseSerialJson(const String& input) {
   if (!action) {
     // No action
     // We can still return something
-    Serial.print("{\"success\":false");
+    Serial.print("{\"success\":0");
     if (qid >= 0) {
       Serial.print(",\"qid\":");
       Serial.print(qid);
@@ -129,11 +129,9 @@ void parseSerialJson(const String& input) {
   }
 
   if (strcmp(action, "close") == 0) {
-    Serial.println("Closing");
     moveServo(MIN_DEGREE);    // 0°
   }
   else if (strcmp(action, "open") == 0) {
-    Serial.println("Opening");
     moveServo(MAX_DEGREE);  // 180°
   }
   else if (strcmp(action, "degree") == 0) {
@@ -143,7 +141,7 @@ void parseSerialJson(const String& input) {
     }
     else {
       // Invalid angle
-      Serial.print("{\"success\":false");
+      Serial.print("{\"success\":0");
       if (qid >= 0) {
         Serial.print(",\"qid\":");
         Serial.print(qid);
@@ -154,22 +152,22 @@ void parseSerialJson(const String& input) {
   }
   else {
     // Unknown action
-    Serial.print("++{\"success\":false");
+    Serial.print("++\n{\"success\":0");
     if (qid >= 0) {
       Serial.print(",\"qid\":");
       Serial.print(qid);
     }
-    Serial.println(",\"error\":\"Unknown action\"}--");
+    Serial.println(",\"error\":\"Unknown action\"}\n--");
     return;
   }
 
   // If we get here, the action was handled successfully
-  Serial.print("++{\"success\":true");
+  Serial.print("++\n{\"success\":1");
   if (qid >= 0) {
     Serial.print(",\"qid\":");
     Serial.print(qid);
   }
-  Serial.println("}--");
+  Serial.println("}\n--");
 }
 
 void setup() {
@@ -180,14 +178,12 @@ void setup() {
   ledcAttachPin(SERVO_PIN, SERVO_CHANNEL);
 
   // Move servo to an initial position (e.g., 90°)
-  for (int angle = MIN_DEGREE; angle <= MAX_DEGREE; angle++) {
+  for (int angle = MIN_DEGREE; angle <= MAX_DEGREE; angle+=10) {
     moveServo(angle);
-    delay(10);
   }
   // Sweep from 180° back to 0°
-  for (int angle = MAX_DEGREE; angle >= MIN_DEGREE; angle--) {
+  for (int angle = MAX_DEGREE; angle >= MIN_DEGREE; angle-=10) {
     moveServo(angle);
-    delay(10);
   }  
 
   moveServo(90);
